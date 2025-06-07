@@ -1,0 +1,423 @@
+/* Custom CSS for FYP Marketplace */
+/* Minimal custom styling to complement Bootstrap dark theme */
+
+/* Root variables for consistency */
+:root {
+    --border-radius-lg: 0.75rem;
+    --transition-base: all 0.3s ease;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--bs-primary-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0);
+    }
+}
+
+/* Enhanced card styles */
+.card {
+    border-radius: var(--border-radius-lg);
+    transition: var(--transition-base);
+    border: 1px solid var(--bs-border-color);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Project card enhancements */
+.project-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+.project-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.project-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Status badge enhancements */
+.badge {
+    font-size: 0.75em;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary:hover {
+    animation: pulse 1.5s infinite;
+}
+
+/* Form enhancements */
+.form-control {
+    border-radius: 0.5rem;
+    transition: var(--transition-base);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+    transform: scale(1.02);
+}
+
+.form-select {
+    border-radius: 0.5rem;
+    transition: var(--transition-base);
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: var(--transition-base);
+    border-radius: 0.5rem;
+    margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Table enhancements */
+.table {
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    transform: scale(1.005);
+    transition: var(--transition-base);
+}
+
+/* Progress bar enhancements */
+.progress {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Alert enhancements */
+.alert {
+    border-radius: var(--border-radius-lg);
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Statistics cards */
+.stats-card {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border: none;
+    color: white;
+    transition: var(--transition-base);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px) scale(1.05);
+}
+
+/* Hero section enhancements */
+.hero-section {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.5;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--bs-primary);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Milestone timeline */
+.milestone-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.milestone-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--bs-border-color);
+}
+
+.milestone-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.milestone-item::before {
+    content: '';
+    position: absolute;
+    left: -1.75rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    border: 2px solid var(--bs-body-bg);
+}
+
+.milestone-item.completed::before {
+    background: var(--bs-success);
+}
+
+.milestone-item.pending::before {
+    background: var(--bs-warning);
+}
+
+/* Rating stars */
+.rating-stars {
+    color: var(--bs-warning);
+}
+
+.rating-stars .far {
+    opacity: 0.3;
+}
+
+/* WhatsApp button enhancement */
+.btn-whatsapp {
+    background-color: #25D366;
+    border-color: #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    color: white;
+}
+
+/* Profile picture placeholders */
+.profile-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .hero-section {
+        text-align: center;
+        padding: 2rem 0;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Accessibility enhancements */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card {
+        border-width: 2px;
+    }
+    
+    .btn {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    .card-footer,
+    .badge {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .container {
+        max-width: none !important;
+    }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-secondary);
+}
+
+/* Empty state illustrations */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1060;
+    min-width: 300px;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.status-indicator.online {
+    background-color: var(--bs-success);
+}
+
+.status-indicator.offline {
+    background-color: var(--bs-secondary);
+}
+
+.status-indicator.busy {
+    background-color: var(--bs-warning);
+}

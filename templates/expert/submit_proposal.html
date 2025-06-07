@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Proposal - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Proposal
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.cover_letter.label(class="form-label") }}
+                            {{ form.cover_letter(class="form-control", rows="8") }}
+                            {% if form.cover_letter.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.cover_letter.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Explain your approach, relevant experience, and why you're the right fit for this project.
+                            </small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.proposed_budget.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        {{ form.proposed_budget(class="form-control") }}
+                                    </div>
+                                    {% if form.proposed_budget.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.proposed_budget.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Budget range: ${{ project.budget_min }} - ${{ project.budget_max }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.delivery_time_weeks.label(class="form-label") }}
+                                    <div class="input-group">
+                                        {{ form.delivery_time_weeks(class="form-control") }}
+                                        <span class="input-group-text">weeks</span>
+                                    </div>
+                                    {% if form.delivery_time_weeks.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.delivery_time_weeks.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Expected duration: {{ project.duration_weeks }} weeks
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-3">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('browse_projects') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Project Details</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ project.title }}</h6>
+                    <p class="text-muted mb-3">{{ project.description[:200] }}...</p>
+                    
+                    <div class="mb-2">
+                        <strong>Category:</strong> {{ project.category.replace('_', ' ').title() }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Budget:</strong> ${{ project.budget_min }} - ${{ project.budget_max }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Duration:</strong> {{ project.duration_weeks }} weeks
+                    </div>
+                    <div class="mb-3">
+                        <strong>Student:</strong> {{ project.student.full_name or project.student.username }}
+                    </div>
+                    
+                    {% if project.tech_stack %}
+                    <div class="mb-3">
+                        <strong>Tech Stack:</strong>
+                        <p class="small">{{ project.tech_stack }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <strong>Requirements:</strong>
+                        <p class="small">{{ project.requirements[:150] }}...</p>
+                    </div>
+                    
+                    <a href="{{ url_for('whatsapp_chat', user_id=project.student.id) }}" class="btn btn-success btn-sm w-100">
+                        <i class="fab fa-whatsapp me-2"></i>Chat with Student
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

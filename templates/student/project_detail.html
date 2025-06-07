@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Project Header -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h3 class="mb-1">{{ project.title }}</h3>
+                    <p class="text-muted mb-0">Posted on {{ project.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div class="text-end">
+                    {% if project.status == 'pending' %}
+                        <span class="badge bg-warning fs-6">Pending Approval</span>
+                    {% elif project.status == 'approved' %}
+                        <span class="badge bg-success fs-6">Approved</span>
+                    {% elif project.status == 'active' %}
+                        <span class="badge bg-primary fs-6">Active</span>
+                    {% elif project.status == 'completed' %}
+                        <span class="badge bg-success fs-6">Completed</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>Project Description</h5>
+                    <p>{{ project.description }}</p>
+                    
+                    <h5>Requirements</h5>
+                    <p>{{ project.requirements }}</p>
+                    
+                    {% if project.tech_stack %}
+                    <h5>Technology Stack</h5>
+                    <p>{{ project.tech_stack }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6><i class="fas fa-tag me-2"></i>Category</h6>
+                            <p class="mb-3">{{ project.category.replace('_', ' ').title() }}</p>
+                            
+                            <h6><i class="fas fa-dollar-sign me-2"></i>Budget Range</h6>
+                            <p class="mb-3">${{ project.budget_min }} - ${{ project.budget_max }}</p>
+                            
+                            <h6><i class="fas fa-clock me-2"></i>Duration</h6>
+                            <p class="mb-3">{{ project.duration_weeks }} weeks</p>
+                            
+                            {% if project.deadline %}
+                            <h6><i class="fas fa-calendar me-2"></i>Deadline</h6>
+                            <p class="mb-0">{{ project.deadline.strftime('%B %d, %Y') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if project.status == 'active' and project.selected_expert %}
+                    <div class="card bg-success text-white mt-3">
+                        <div class="card-body">
+                            <h6><i class="fas fa-user-tie me-2"></i>Selected Expert</h6>
+                            <p class="mb-2">{{ project.selected_expert.full_name or project.selected_expert.username }}</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('whatsapp_chat', user_id=project.selected_expert.id) }}" class="btn btn-light btn-sm">
+                                    <i class="fab fa-whatsapp me-1"></i>Chat
+                                </a>
+                                <a href="{{ url_for('project_milestones', project_id=project.id) }}" class="btn btn-light btn-sm">
+                                    <i class="fas fa-tasks me-1"></i>Milestones
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Proposals Section -->
+    {% if project.status == 'approved' or proposals %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-handshake me-2"></i>Proposals 
+                <span class="badge bg-secondary">{{ proposals|length }}</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if proposals %}
+                {% for proposal in proposals %}
+                <div class="card mb-3 {% if proposal.status == 'accepted' %}border-success{% elif proposal.status == 'rejected' %}border-danger{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">{{ proposal.expert.full_name or proposal.expert.username }}</h6>
+                                <div class="d-flex align-items-center">
+                                    {% if proposal.expert.rating > 0 %}
+                                        <div class="me-2">
+                                            {% for i in range(5) %}
+                                                {% if i < proposal.expert.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-warning"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <small class="text-muted">({{ proposal.expert.total_reviews }} reviews)</small>
+                                    {% else %}
+                                        <small class="text-muted">No reviews yet</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                {% if proposal.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif proposal.status == 'accepted' %}
+                                    <span class="badge bg-success">Accepted</span>
+                                {% elif proposal.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>Cover Letter</h6>
+                                <p>{{ proposal.cover_letter }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-dollar-sign me-2"></i>Proposed Budget</h6>
+                                        <p class="mb-2">${{ proposal.proposed_budget }}</p>
+                                        
+                                        <h6><i class="fas fa-clock me-2"></i>Delivery Time</h6>
+                                        <p class="mb-3">{{ proposal.delivery_time_weeks }} weeks</p>
+                                        
+                                        {% if proposal.status == 'pending' and project.status == 'approved' %}
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ url_for('accept_proposal', proposal_id=proposal.id) }}" 
+                                               class="btn btn-success btn-sm"
+                                               onclick="return confirm('Are you sure you want to accept this proposal?')">
+                                                <i class="fas fa-check me-1"></i>Accept
+                                            </a>
+                                            <a href="{{ url_for('whatsapp_chat', user_id=proposal.expert.id) }}" class="btn btn-info btn-sm">
+                                                <i class="fab fa-whatsapp me-1"></i>Chat
+                                            </a>
+                                        </div>
+                                        {% elif proposal.status == 'accepted' %}
+                                        <a href="{{ url_for('whatsapp_chat', user_id=proposal.expert.id) }}" class="btn btn-success btn-sm">
+                                            <i class="fab fa-whatsapp me-1"></i>Chat with Expert
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-handshake fa-4x text-muted mb-3"></i>
+                    <h5>No Proposals Yet</h5>
+                    <p class="text-muted">Your project is waiting for expert proposals. They will appear here once submitted.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

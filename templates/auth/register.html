@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Register - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="registrationForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.username.label(class="form-label") }}
+                                    {{ form.username(class="form-control") }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.username.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.email.label(class="form-label") }}
+                                    {{ form.email(class="form-control") }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.email.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.full_name.label(class="form-label") }}
+                                    {{ form.full_name(class="form-control") }}
+                                    {% if form.full_name.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.full_name.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.phone.label(class="form-label") }}
+                                    {{ form.phone(class="form-control", placeholder="+1234567890") }}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.phone.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role(class="form-select", id="roleSelect") }}
+                            {% if form.role.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.role.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Conditional fields -->
+                        <div id="studentFields" style="display: none;">
+                            <div class="mb-3">
+                                {{ form.university.label(class="form-label") }}
+                                {{ form.university(class="form-control") }}
+                            </div>
+                        </div>
+                        
+                        <div id="expertFields" style="display: none;">
+                            <div class="mb-3">
+                                {{ form.skills.label(class="form-label") }}
+                                {{ form.skills(class="form-control", rows="3", placeholder="e.g., Python, Machine Learning, Web Development") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.bio.label(class="form-label") }}
+                            {{ form.bio(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.password.label(class="form-label") }}
+                                    {{ form.password(class="form-control") }}
+                                    {% if form.password.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.password.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.password2.label(class="form-label") }}
+                                    {{ form.password2(class="form-control") }}
+                                    {% if form.password2.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.password2.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('roleSelect').addEventListener('change', function() {
+    const role = this.value;
+    const studentFields = document.getElementById('studentFields');
+    const expertFields = document.getElementById('expertFields');
+    
+    if (role === 'student') {
+        studentFields.style.display = 'block';
+        expertFields.style.display = 'none';
+    } else if (role === 'expert') {
+        studentFields.style.display = 'none';
+        expertFields.style.display = 'block';
+    } else {
+        studentFields.style.display = 'none';
+        expertFields.style.display = 'none';
+    }
+});
+
+// Trigger change event on page load
+document.getElementById('roleSelect').dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Project Milestones - {{ project.title }} - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Project Header -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-1">
+                        <i class="fas fa-tasks me-2"></i>Project Milestones
+                    </h3>
+                    <p class="text-muted mb-0">{{ project.title }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-user me-2"></i>Student</h6>
+                    <p>{{ project.student.full_name or project.student.username }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-user-tie me-2"></i>Expert</h6>
+                    <p>{{ project.selected_expert.full_name or project.selected_expert.username if project.selected_expert else 'Not assigned' }}</p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <h6><i class="fas fa-dollar-sign me-2"></i>Budget</h6>
+                    <p>${{ project.budget_min }} - ${{ project.budget_max }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="fas fa-calendar me-2"></i>Duration</h6>
+                    <p>{{ project.duration_weeks }} weeks</p>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="fas fa-info-circle me-2"></i>Status</h6>
+                    <p>
+                        {% if project.status == 'active' %}
+                            <span class="badge bg-primary">Active</span>
+                        {% elif project.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ project.status.title() }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Milestone Form (Only for students) -->
+    {% if current_user.id == project.student_id %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Milestone</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('add_milestone', project_id=project.id) }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form.budget_percentage.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.budget_percentage(class="form-control") }}
+                                <span class="input-group-text">%</span>
+                            </div>
+                            {% if form.budget_percentage.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.budget_percentage.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control", rows="3") }}
+                    {% if form.description.errors %}
+                        <div class="text-danger">
+                            {% for error in form.description.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex gap-2">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Milestones List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>Milestones
+                <span class="badge bg-secondary">{{ milestones|length }}</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if milestones %}
+                <!-- Progress Overview -->
+                <div class="mb-4">
+                    {% set completed_milestones = milestones|selectattr('status', 'equalto', 'approved')|list %}
+                    {% set total_budget_completed = completed_milestones|sum(attribute='budget_percentage') %}
+                    {% set progress_percentage = (completed_milestones|length / milestones|length * 100) if milestones else 0 %}
+                    
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5>{{ completed_milestones|length }}/{{ milestones|length }}</h5>
+                                    <p class="mb-0">Completed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5>{{ total_budget_completed|round(1) }}%</h5>
+                                    <p class="mb-0">Budget Released</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5>{{ milestones|selectattr('status', 'equalto', 'submitted')|list|length }}</h5>
+                                    <p class="mb-0">Pending Review</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5>{{ progress_percentage|round(1) }}%</h5>
+                                    <p class="mb-0">Overall Progress</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-3">
+                        <label class="form-label">Project Progress</label>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ progress_percentage }}%" 
+                                 aria-valuenow="{{ progress_percentage }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ progress_percentage|round(1) }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Milestones List -->
+                <div class="row">
+                    {% for milestone in milestones %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card 
+                            {% if milestone.status == 'approved' %}border-success
+                            {% elif milestone.status == 'submitted' %}border-warning
+                            {% elif milestone.status == 'rejected' %}border-danger
+                            {% else %}border-secondary{% endif %}">
+                            
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ milestone.title }}</h6>
+                                <div>
+                                    {% if milestone.status == 'pending' %}
+                                        <span class="badge bg-secondary">Pending</span>
+                                    {% elif milestone.status == 'in_progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% elif milestone.status == 'submitted' %}
+                                        <span class="badge bg-warning">Submitted</span>
+                                    {% elif milestone.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif milestone.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                {% if milestone.description %}
+                                    <p class="card-text">{{ milestone.description }}</p>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-muted">
+                                        <i class="fas fa-percentage me-1"></i>{{ milestone.budget_percentage }}% of budget
+                                    </span>
+                                    <span class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>{{ milestone.created_at.strftime('%Y-%m-%d') }}
+                                    </span>
+                                </div>
+                                
+                                {% if milestone.submission_notes %}
+                                    <div class="alert alert-info">
+                                        <strong>Submission Notes:</strong><br>
+                                        {{ milestone.submission_notes }}
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Actions -->
+                                <div class="d-flex gap-2">
+                                    {% if current_user.id == project.selected_expert_id %}
+                                        <!-- Expert Actions -->
+                                        {% if milestone.status == 'pending' %}
+                                            <a href="{{ url_for('submit_milestone', milestone_id=milestone.id) }}" 
+                                               class="btn btn-primary btn-sm"
+                                               onclick="return confirm('Mark this milestone as submitted?')">
+                                                <i class="fas fa-paper-plane me-1"></i>Submit
+                                            </a>
+                                        {% elif milestone.status == 'submitted' %}
+                                            <button class="btn btn-warning btn-sm" disabled>
+                                                <i class="fas fa-clock me-1"></i>Awaiting Review
+                                            </button>
+                                        {% elif milestone.status == 'approved' %}
+                                            <button class="btn btn-success btn-sm" disabled>
+                                                <i class="fas fa-check me-1"></i>Completed
+                                            </button>
+                                        {% endif %}
+                                    {% elif current_user.id == project.student_id %}
+                                        <!-- Student Actions -->
+                                        {% if milestone.status == 'submitted' %}
+                                            <a href="{{ url_for('approve_milestone', milestone_id=milestone.id) }}" 
+                                               class="btn btn-success btn-sm"
+                                               onclick="return confirm('Approve this milestone? This will release the budget percentage.')">
+                                                <i class="fas fa-check me-1"></i>Approve
+                                            </a>
+                                        {% elif milestone.status == 'approved' %}
+                                            <button class="btn btn-success btn-sm" disabled>
+                                                <i class="fas fa-check me-1"></i>Approved
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Timestamps -->
+                                <div class="mt-3">
+                                    {% if milestone.submitted_at %}
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-paper-plane me-1"></i>Submitted: {{ milestone.submitted_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    {% endif %}
+                                    {% if milestone.approved_at %}
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-check me-1"></i>Approved: {{ milestone.approved_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tasks fa-5x text-muted mb-3"></i>
+                    <h4>No Milestones Yet</h4>
+                    {% if current_user.id == project.student_id %}
+                        <p class="text-muted mb-4">Create milestones to track project progress and budget allocation.</p>
+                    {% else %}
+                        <p class="text-muted">The student hasn't created any milestones for this project yet.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Project Actions -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-comments me-2"></i>Communication</h6>
+                    {% if current_user.id == project.student_id and project.selected_expert %}
+                        <a href="{{ url_for('whatsapp_chat', user_id=project.selected_expert.id) }}" class="btn btn-success">
+                            <i class="fab fa-whatsapp me-2"></i>Chat with Expert
+                        </a>
+                    {% elif current_user.id == project.selected_expert_id %}
+                        <a href="{{ url_for('whatsapp_chat', user_id=project.student.id) }}" class="btn btn-success">
+                            <i class="fab fa-whatsapp me-2"></i>Chat with Student
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-star me-2"></i>Project Completion</h6>
+                    {% if project.status == 'completed' %}
+                        <span class="badge bg-success fs-6">Project Completed</span>
+                    {% else %}
+                        <p class="text-muted mb-0">Complete all milestones to finish the project.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh milestone status every 30 seconds
+setInterval(function() {
+    // Only refresh if there are pending or submitted milestones
+    const pendingMilestones = document.querySelectorAll('.badge.bg-warning, .badge.bg-secondary');
+    if (pendingMilestones.length > 0) {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

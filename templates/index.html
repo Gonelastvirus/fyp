@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Find Expert Advisors for Your Final Year Project</h1>
+                <p class="lead mb-4">Connect with experienced professionals who can guide your FYP to success. Post your project idea and receive expert proposals within hours.</p>
+                <div class="d-flex gap-3">
+                    {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-users fa-10x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <i class="fas fa-project-diagram fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ stats.total_projects }}</h3>
+                        <p class="mb-0">Total Projects</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <i class="fas fa-user-tie fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ stats.total_experts }}</h3>
+                        <p class="mb-0">Expert Advisors</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ stats.total_students }}</h3>
+                        <p class="mb-0">Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card bg-danger text-white h-100">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ stats.active_projects }}</h3>
+                        <p class="mb-0">Active Projects</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Works</h2>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-plus-circle fa-4x text-primary mb-3"></i>
+                        <h4>1. Post Your Project</h4>
+                        <p>Students describe their FYP requirements, budget, and timeline.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-handshake fa-4x text-success mb-3"></i>
+                        <h4>2. Receive Proposals</h4>
+                        <p>Expert advisors submit detailed proposals with their approach and pricing.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-rocket fa-4x text-warning mb-3"></i>
+                        <h4>3. Complete Project</h4>
+                        <p>Work together through milestones to successfully complete your FYP.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Projects -->
+{% if recent_projects %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Recent Projects</h2>
+        <div class="row">
+            {% for project in recent_projects %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text">{{ project.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-info">{{ project.category.replace('_', ' ').title() }}</span>
+                            <small class="text-muted">${{ project.budget_min }} - ${{ project.budget_max }}</small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>{{ project.duration_weeks }} weeks
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Start Your Final Year Project?</h2>
+        <p class="lead mb-4">Join thousands of students who have successfully completed their FYPs with expert guidance.</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-rocket me-2"></i>Get Started Today
+        </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

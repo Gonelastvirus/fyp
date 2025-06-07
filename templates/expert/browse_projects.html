@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Projects - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="fas fa-search me-2"></i>Browse Projects</h1>
+            <p class="text-muted">Find Final Year Projects that match your expertise and submit proposals.</p>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="search" class="form-label">Search Projects</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search or '' }}" placeholder="Search by title or description...">
+                </div>
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        {% for value, label in categories %}
+                            <option value="{{ value }}" {% if current_category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Projects Grid -->
+    {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            <span class="badge bg-info">{{ project.category.replace('_', ' ').title() }}</span>
+                        </div>
+                        
+                        <p class="card-text">{{ project.description[:150] }}...</p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ project.student.full_name or project.student.username }}
+                            </small>
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <small class="text-muted">Budget</small>
+                                <div class="fw-bold">${{ project.budget_min }}-${{ project.budget_max }}</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Duration</small>
+                                <div class="fw-bold">{{ project.duration_weeks }}w</div>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Proposals</small>
+                                <div class="fw-bold">{{ project.proposals.count() }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            {% set user_proposal = project.proposals.filter_by(expert_id=current_user.id).first() %}
+                            {% if user_proposal %}
+                                {% if user_proposal.status == 'pending' %}
+                                    <button class="btn btn-warning btn-sm flex-fill" disabled>
+                                        <i class="fas fa-clock me-1"></i>Proposal Pending
+                                    </button>
+                                {% elif user_proposal.status == 'accepted' %}
+                                    <button class="btn btn-success btn-sm flex-fill" disabled>
+                                        <i class="fas fa-check me-1"></i>Proposal Accepted
+                                    </button>
+                                {% elif user_proposal.status == 'rejected' %}
+                                    <button class="btn btn-danger btn-sm flex-fill" disabled>
+                                        <i class="fas fa-times me-1"></i>Proposal Rejected
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ url_for('submit_proposal', project_id=project.id) }}" class="btn btn-primary btn-sm flex-fill">
+                                    <i class="fas fa-paper-plane me-1"></i>Submit Proposal
+                                </a>
+                            {% endif %}
+                            <a href="{{ url_for('whatsapp_chat', user_id=project.student.id) }}" class="btn btn-success btn-sm">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>Posted {{ project.created_at.strftime('%B %d, %Y') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-5x text-muted mb-3"></i>
+            <h4>No Projects Found</h4>
+            {% if search or current_category %}
+                <p class="text-muted mb-4">No projects match your current filters. Try adjusting your search criteria.</p>
+                <a href="{{ url_for('browse_projects') }}" class="btn btn-secondary">
+                    <i class="fas fa-undo me-2"></i>Clear Filters
+                </a>
+            {% else %}
+                <p class="text-muted">No approved projects are currently available. Check back later for new opportunities.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

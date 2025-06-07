@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - FYP Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-tachometer-alt me-2"></i>Student Dashboard</h1>
+                <a href="{{ url_for('post_project') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Post New Project
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-project-diagram fa-2x mb-2"></i>
+                    <h4>{{ projects|length }}</h4>
+                    <p class="mb-0">Total Projects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4>{{ projects|selectattr('status', 'equalto', 'pending')|list|length }}</h4>
+                    <p class="mb-0">Pending Approval</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-play fa-2x mb-2"></i>
+                    <h4>{{ projects|selectattr('status', 'equalto', 'active')|list|length }}</h4>
+                    <p class="mb-0">Active Projects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check fa-2x mb-2"></i>
+                    <h4>{{ projects|selectattr('status', 'equalto', 'completed')|list|length }}</h4>
+                    <p class="mb-0">Completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Projects List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>My Projects</h5>
+        </div>
+        <div class="card-body">
+            {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Project Title</th>
+                                <th>Category</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                                <th>Proposals</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td>
+                                    <strong>{{ project.title }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ project.description[:50] }}...</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ project.category.replace('_', ' ').title() }}</span>
+                                </td>
+                                <td>${{ project.budget_min }} - ${{ project.budget_max }}</td>
+                                <td>
+                                    {% if project.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    {% elif project.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif project.status == 'active' %}
+                                        <span class="badge bg-primary">Active</span>
+                                    {% elif project.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif project.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ project.status.title() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ project.proposals.count() }}</span>
+                                </td>
+                                <td>{{ project.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="{{ url_for('student_project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if project.status == 'active' %}
+                                        <a href="{{ url_for('project_milestones', project_id=project.id) }}" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-tasks"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-project-diagram fa-5x text-muted mb-3"></i>
+                    <h4>No Projects Yet</h4>
+                    <p class="text-muted mb-4">Start by posting your first Final Year Project to connect with expert advisors.</p>
+                    <a href="{{ url_for('post_project') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Post Your First Project
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
